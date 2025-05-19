@@ -217,8 +217,44 @@ class UserController extends Controller
 
     public function view_profil(){
         $user = Auth::user();
-        return view('users.profil',compact('user'));
+        $id = $user->id;
+        $utilisateur = User::where('id',$id)->get();
+        return view('users.profil',compact('utilisateur'));
     }
- 
+
+   public function edit_profil(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'contact' => 'nullable|string',
+            'password' => 'nullable|string|min:6|confirmed',
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->contact = $request->contact;
+
+        // Image si fournie
+        if ($request->hasFile('image_user')) {
+            $file = $request->file('image_user');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/images'), $filename);
+            $user->image_user = $filename;
+        }
+
+        // Mot de passe seulement si rempli
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+
+        $user->save();
+
+        return back()->with('success', 'Profil mis à jour avec succès.');
+    }
+
+
 
 }

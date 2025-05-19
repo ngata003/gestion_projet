@@ -233,7 +233,7 @@
     </div>
 
     <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm modal-dialog-scrollable"> <!-- MODAL COMPACT ET SCROLLABLE -->
+        <div class="modal-dialog modal-sm modal-dialog-scrollable"> 
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white py-2">
                     <h6 class="modal-title" id="taskModalLabel">Tâches liées à la réalisation</h6>

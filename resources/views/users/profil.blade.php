@@ -137,10 +137,7 @@
                     <div class="d-sm-flex justify-content-between align-items-start">
                         <div>
                           <h4 class="card-title card-title-dash"> Espace Gestionnaires </h4>
-                          <p class="card-subtitle card-subtitle-dash"> management des employes </p>
-                        </div>
-                        <div>
-                          <button class="btn btn-primary btn-lg text-white mb-0 me-0" data-bs-toggle="modal" data-bs-target="#importModal" type="button" ><i class="mdi mdi-account-plus"></i>Ajouter un nouvel employé  </button>
+                          <p class="card-subtitle card-subtitle-dash"> Mon profil </p>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -155,16 +152,14 @@
                           </tr>
                         </thead>
                         <tbody>
-                        @foreach ($profil as $gestion )
+                        @foreach ($utilisateur as $gestion )
                         <tr>
                             <td > {{$gestion->name}} </td>
                             <td>  {{$gestion->email}} </td>
                             <td>  {{$gestion->contact}}</td>
-                            <td>  {{$gestion->role}} </td>
-                            <td><img src="" alt=""></td>
+                            <td><img src="/assets/images/{{$gestion->image_user}}" alt=""></td>
                             <td>
-                                <button class="btn btn-secondary text-white" data-id="{{$gestion->id}}" data-nom="{{$gestion->name}}" data-email="{{$gestion->email}}"  data-contact="{{$gestion->contact}}"  data-role="{{$gestion->role}}" onclick="openEditModal(this)"> <i class="fas fa-edit"></i> </button>
-                                <button class="btn btn-danger text-white" data-id="{{$gestion->id}}" onclick="openDeleteModal(this)" > <i class="fas fa-trash"></i> </button>
+                                <button class="btn btn-secondary text-white" data-id="{{$gestion->id}}" data-image="{{$gestion->image_user}}" data-nom="{{$gestion->name}}" data-email="{{$gestion->email}}"  data-contact="{{$gestion->contact}}"  data-role="{{$gestion->role}}" onclick="openEditModal(this)"> <i class="fas fa-edit"></i> </button>
                             </td>
                           </tr>
                         @endforeach
@@ -184,46 +179,7 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel"> Ajouter un employé   </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" action="/add_gestionnaires" id="formulaire" enctype="multipart/form-data">
-                        @csrf
-                    <div class="mb-3">
-                            <label for="centreName" class="form-label">Nom </label>
-                            <input type="text" name="name" class="form-control" id="" placeholder="entrer un nom valide ">
-                        </div>
-                        <div class="mb-3">
-                            <label for="centreName" class="form-label"> Email </label>
-                            <input type="email" name="email" class="form-control" id="centreName" placeholder="entrer un email valide ">
-                        </div>
-                        <div class="mb-3">
-                            <label for="centreName" class="form-label"> Contact </label>
-                            <input type="tel" name="contact" class="form-control" id="" placeholder="entrer un contact valide">
-                        </div>
-                        <input type="hidden" name="type" value="gestionnaire" class="form-control" id="" placeholder="entrer un type">
-                        <div class="mb-3">
-                            <label for="centreName" class="form-label"> role du gestionnaire </label>
-                            <select name="role" class="form-control" id="">
-                                <option> selectionnez un role </option>
-                                <option value="analyste"> analyste </option>
-                                <option value="developpeur"> developpeur </option>
-                            </select>
-                        </div>
-                        <div class="button-container">
-                            <button type="submit" id="bouton" class="button btn btn-success" > enregistrer </button>
-                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" >Fermer</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -250,12 +206,17 @@
                             <input type="tel" name="contact" class="form-control" id="contact" placeholder="entrer un contact valide">
                         </div>
                         <div class="mb-3">
-                            <label for="centreName" class="form-label"> role du gestionnaire </label>
-                            <select name="role" class="form-control" id="role">
-                                <option> selectionnez un role </option>
-                                <option value="developpeur"> developpeur </option>
-                                <option value="analyste"> analyste </option>
-                            </select>
+                            <label for="centreName" class="form-label"> image Utilisateur </label>
+                            <input type="file" name="image_user" class="form-control" id="image_utilisateur" placeholder="entrer un contact valide">
+                            <img src="" id="image_utilisateur" height="45px" width="45px" alt="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="centreName" class="form-label"> entrer un mot de passe  </label>
+                            <input type="password" name="password" class="form-control" id="password" placeholder="confirmer le mot de passe">
+                        </div>
+                        <div class="mb-3">
+                            <label for="centreName" class="form-label"> confirmez votre mot de passe </label>
+                            <input type="password" name="password_confirmation" class="form-control" id="password" placeholder="entrer un mot de passe ">
                         </div>
                         <div class="button-container">
                           <input type="submit" class="button btn btn-success" name="save" value="Enregistrer">
@@ -286,10 +247,10 @@
             var image = button.getAttribute('data-image');
 
             document.getElementById('editModalLabel').textContent = 'Editer une agence ';
-            document.getElementById('editForm').action = '/profil_edit/' + id;
+            document.getElementById('editForm').action = '/edit_profil/' + id;
             document.getElementById('name').value = nom;
             document.getElementById('email').value = email;
-            document.getElementById('role').value = role;
+            document.getElementById('image_utilisateur').src = '/assets/images/' + image;
             document.getElementById('contact').value = contact;
 
             var editModal = new bootstrap.Modal(document.getElementById('editModal'));

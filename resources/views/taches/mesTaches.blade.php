@@ -42,7 +42,7 @@
                 <img class="img-xs rounded-circle" src="../../assets/images/{{$user->image_user}}" height="45px" width="45px" alt="Profile image"> </a>
               <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
                 <div class="dropdown-header text-center">
-                  <img class="img-md rounded-circle" src="../../assets/images/{{$user->image_user}}" alt="Profile image">
+                  <img class="img-md rounded-circle" src="../../assets/images/{{$user->image_user}}" height="45px" width="45px" alt="Profile image">
                   <p class="mb-1 mt-3 fw-semibold">{{$user->name}}</p>
                   <p class="fw-light text-muted mb-0">{{$user->email}}</p>
                   <p>  @if (isset($project_active)){{$project_active->nom_projet}}@endif </p>

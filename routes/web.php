@@ -27,7 +27,9 @@ Route::get('/realisations',[TachesController::class,'view_realisations'])->middl
 Route::get('/taches',[TachesController::class,'AllTaches'])->middleware('role:admin');
 Route::get('/view_details/{id}',[TachesController::class,'afficher_details'])->middleware('role:admin');
 Route::get('/profil',[UserController::class,'view_profil'])->middleware('role:admin,developpeur,analyste');
-Route::get('/view_profil/{id}',[ProjetController::class,'view_profil'])->middleware('role:admin,developpeur,analyste');
+Route::get('myProfil', [UserController::class,'view_profil'])->middleware('role:admin,developpeur,analyste');
+Route::put('/edit_profil/{id}',[UserController::class,'edit_profil'])->middleware('role:admin,developpeur,analyste');
+
 
 Route::post('/add_inscription', [UserController::class,'add_inscription'])->middleware('role:admin');
 Route::post('/add_projet',[ProjetController::class,'add_projet'])->middleware('role:admin');
