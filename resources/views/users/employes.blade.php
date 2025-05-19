@@ -60,12 +60,7 @@
       <div class="container-fluid page-body-wrapper">
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
           <ul class="nav">
-            <li class="nav-item">
-              <a class="nav-link" href="mesTaches">
-                <i class="menu-icon mdi mdi-clipboard-text-outline"></i>
-                <span class="menu-title"> Mes Taches </span>
-              </a>
-            </li>
+            @if (Auth::user()->role == 'admin')
             <li class="nav-item">
               <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
                 <i class="menu-icon mdi mdi-account-circle-outline"></i>
@@ -74,7 +69,7 @@
               </a>
               <div class="collapse" id="form-elements">
                 <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"><a class="nav-link" href="profil"> Mon profil </a></li>
+                  <li class="nav-item"><a class="nav-link" href="myProfil"> Mon profil </a></li>
                   <li class="nav-item"><a class="nav-link" href="utilisateurs"> Employes </a></li>
                 </ul>
               </div>
@@ -92,6 +87,27 @@
                 </ul>
               </div>
             </li>
+            @endif
+            @if (Auth::user()->role == 'developpeur' || Auth::user()->role == 'analyste')
+            <li class="nav-item">
+              <a class="nav-link" href="mesTaches">
+                <i class="menu-icon mdi mdi-clipboard-text-outline"></i>
+                <span class="menu-title"> Mes Taches </span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
+                <i class="menu-icon mdi mdi-account-circle-outline"></i>
+                <span class="menu-title"> Utilisateurs </span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="form-elements">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item"><a class="nav-link" href="myProfil"> Mon profil </a></li>
+                </ul>
+              </div>
+            </li>
+            @endif
           </ul>
         </nav>
         <div class="main-panel">

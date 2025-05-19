@@ -137,7 +137,7 @@ class TachesController extends Controller
             $tacheRealisee->id_realisation = $id_realisation;
             $tacheRealisee->status = "non_fait";
 
-            $tacheRealisee->nom_gestionnaire = $user->name;
+            $tacheRealisee->nom_gestionnaire = $request->input('nom_gestionnaire');
             $tacheRealisee->nom_projet = $project->nom_projet;
 
             $tacheRealisee->save();
@@ -153,11 +153,51 @@ class TachesController extends Controller
 
     public function mesTaches(){
         $user = Auth::user();
-        $project = Session::get('project_active');
+        $project = Session::get('projet_active'); // ✅ correspond à la clé définie à la connexion
 
-        $taches = Taches_realisation::where('nom_gestionnaire',$user->name)->where('nom_projet',$project->nom_projet)->get();
+        if (!$project) {
+            return redirect('/')->with('error', 'Aucun projet actif sélectionné.');
+        }
 
-        return view('taches.mesTaches',compact('taches'));
+        $taches = Taches_realisation::where('nom_gestionnaire', $user->name)
+                    ->where('nom_projet', $project->nom_projet)
+                    ->get();
+
+        return view('taches.mesTaches', compact('taches'));
+    }
+
+    public function afficher_details($id){
+        $taches = Taches_realisation::where('id_realisation',$id)->get();
+        return response()->json($taches);
+    }
+
+    public function delete_realisations($id){
+
+        $realisations = Realisation::find($id);
+        $realisations->delete();
+
+        $taches_realisations = Taches_realisation::where('id_realisation',$id)->get();
+
+        foreach ($taches_realisations as $toch) {
+            $tache = Tache::where('nom_tache',$toch->nom_tache)->first();
+            if($tache) {
+             $tache->status = false;
+             $tache->save();
+            }
+        }
+
+        Taches_realisation::where('id_realisation',$id)->delete();
+
+        return back()->with('realisationDeleted','réalisation supprimée avec succès');
+    }
+
+    public function valider_taches($id){
+        
+        $taches = Taches_realisation::find($id);
+        $taches->status = 'fait';
+        $taches->save();
+
+        return back()->with('taskValidated','tache validée avec succès');
     }
 
 

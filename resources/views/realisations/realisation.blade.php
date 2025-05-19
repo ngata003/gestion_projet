@@ -16,6 +16,12 @@
     <link rel="shortcut icon" href="../../assets/images/favicon.png" />
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        input[type="checkbox"][disabled] {
+            accent-color: green !important;
+        }
+    </style>
+
   </head>
   <body>
     <div class="container-scroller">
@@ -42,7 +48,7 @@
                 <img class="img-xs rounded-circle" src="../../assets/images/{{$user->image_user}}" alt="Profile image"> </a>
               <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
                 <div class="dropdown-header text-center">
-                  <img class="img-md rounded-circle" src="../../assets/images/faces/{{$user->image_user}}" height="45px" width="45px" alt="Profile image">
+                  <img class="img-md rounded-circle" src="../../assets/images/{{$user->image_user}}" height="45px" width="45px" alt="Profile image">
                   <p class="mb-1 mt-3 fw-semibold">{{$user->name}}</p>
                   <p class="fw-light text-muted mb-0">{{$user->email}}</p>
                   <p>  @if (isset($project_active)){{$project_active->nom_projet}}@endif </p>
@@ -60,38 +66,55 @@
       <div class="container-fluid page-body-wrapper">
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
           <ul class="nav">
-            <li class="nav-item">
-              <a class="nav-link" href="mesTaches">
-                <i class="menu-icon mdi mdi-clipboard-text-outline"></i>
-                <span class="menu-title"> Mes Taches </span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
-                <i class="menu-icon mdi mdi-account-circle-outline"></i>
-                <span class="menu-title"> Utilisateurs </span>
-                <i class="menu-arrow"></i>
-              </a>
-              <div class="collapse" id="form-elements">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"><a class="nav-link" href="profil"> Mon profil </a></li>
-                  <li class="nav-item"><a class="nav-link" href="utilisateurs"> Employes </a></li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-                <i class="menu-icon mdi mdi-format-list-checkbox  "></i>
-                <span class="menu-title"> Taches </span>
-                <i class="menu-arrow"></i>
-              </a>
-              <div class="collapse" id="ui-basic">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"> <a class="nav-link" href="taches"> Ajouter une tache </a></li>
-                  <li class="nav-item"> <a class="nav-link" href="realisations"> evolution taches </a></li>
-                </ul>
-              </div>
-            </li>
+            @if (Auth::user()->role == 'admin')
+                <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
+                    <i class="menu-icon mdi mdi-account-circle-outline"></i>
+                    <span class="menu-title"> Utilisateurs </span>
+                    <i class="menu-arrow"></i>
+                </a>
+                <div class="collapse" id="form-elements">
+                    <ul class="nav flex-column sub-menu">
+                    <li class="nav-item"><a class="nav-link" href="myProfil"> Mon profil </a></li>
+                    <li class="nav-item"><a class="nav-link" href="utilisateurs"> Employes </a></li>
+                    </ul>
+                </div>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+                    <i class="menu-icon mdi mdi-format-list-checkbox  "></i>
+                    <span class="menu-title"> Taches </span>
+                    <i class="menu-arrow"></i>
+                </a>
+                <div class="collapse" id="ui-basic">
+                    <ul class="nav flex-column sub-menu">
+                    <li class="nav-item"> <a class="nav-link" href="taches"> Ajouter une tache </a></li>
+                    <li class="nav-item"> <a class="nav-link" href="realisations"> evolution taches </a></li>
+                    </ul>
+                </div>
+                </li>
+            @endif
+            @if (Auth::user()->role == 'analyste' || Auth::user()->role == 'developpeur')
+                <li class="nav-item">
+                <a class="nav-link" href="mesTaches">
+                    <i class="menu-icon mdi mdi-clipboard-text-outline"></i>
+                    <span class="menu-title"> Mes Taches </span>
+                </a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
+                    <i class="menu-icon mdi mdi-account-circle-outline"></i>
+                    <span class="menu-title"> Utilisateurs </span>
+                    <i class="menu-arrow"></i>
+                </a>
+                <div class="collapse" id="form-elements">
+                    <ul class="nav flex-column sub-menu">
+                    <li class="nav-item"><a class="nav-link" href="myProfil"> Mon profil </a></li>
+                    </ul>
+                </div>
+                </li>
+            @endif
+
           </ul>
         </nav>
         <div class="main-panel">
@@ -133,12 +156,13 @@
                                 <td> {{$stat['non_faites']}} </td>
                                 <td>
                                     <button class="btn btn-secondary text-white" data-id="{{$stat['id']}}"  onclick="openEditModal(this)" > <i class="fas fa-edit"></i> </button>
-                                    <button class="btn btn-danger text-white" data-id="{{$stat['id']}}"  onclick="openDeleteModal(this)" > <i class="fas fa-eye"></i> </button>
+                                    <button class="btn btn-success text-white" data-id="{{$stat['id']}}" data-bs-target="#taskModal" data-bs-toggle="modal"   onclick="openDeleteModal(this)" > <i class="fas fa-eye"></i> </button>
+                                    <button class="btn btn-danger text-white" data-id="{{$stat['id']}}" onclick="openSuppModal(this)"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>
                             @endforeach
                         </tbody>
-                      </table>
+                    </table>
                     </div>
                   </div>
                 </div>
@@ -207,6 +231,49 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-scrollable"> <!-- MODAL COMPACT ET SCROLLABLE -->
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white py-2">
+                    <h6 class="modal-title" id="taskModalLabel">Tâches liées à la réalisation</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+
+                <div class="modal-body p-2">
+                    <ul class="list-group list-group-flush" id="tacheList">
+                    </ul>
+                </div>
+
+                <div class="modal-footer p-2">
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="SuppModal" tabindex="-1" aria-labelledby="suppModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="SuppModal">Supprimer la tache </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer cette tache ?
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Non</button>
+                <form method="POST" id="deleteForm">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-success">Oui</button>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
     <script src="../../assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
     <script src="../../assets/js/off-canvas.js"></script>
@@ -254,5 +321,68 @@
              v++;
         }
     </script>
+
+    <script>
+        function openDeleteModal(button) {
+            const idRealisation = button.getAttribute('data-id');
+
+            fetch(`/view_details/${idRealisation}`)
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('tacheList');
+                    list.innerHTML = ''; // Vide la liste actuelle
+
+                    if (data.length === 0) {
+                        list.innerHTML = '<li class="list-group-item text-center text-muted">Aucune tâche trouvée.</li>';
+                    } else {
+                        data.forEach(tache => {
+                            const li = document.createElement('li');
+                            li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center', 'py-1', 'px-2');
+
+                            const label = document.createElement('span');
+                            label.textContent = tache.nom_tache ?? 'Tâche sans nom';
+
+                            const status = document.createElement('span');
+
+                            if (tache.status && tache.status.toLowerCase() === 'fait') {
+                                status.innerHTML = `
+                                    <input type="checkbox" checked disabled
+                                        class="form-check-input"
+                                        style="width: 1.2em; height: 1.2em; accent-color: green; cursor: default;">
+                                `;
+                            } else {
+                                status.innerHTML = `
+                                    <i class="fas fa-times-circle text-danger"
+                                    style="font-size: 1.2em; vertical-align: middle;"></i>
+                                `;
+                            }
+
+                            li.appendChild(label);
+                            li.appendChild(status);
+                            list.appendChild(li);
+                        });
+                    }
+
+                    // Affiche le modal
+                    const modalElement = document.getElementById('taskModal');
+                    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+                    modalInstance.show();
+                })
+                .catch(error => {
+                    console.error('Erreur de chargement des tâches:', error);
+                });
+        }
+    </script>
+
+    <script>
+        function openSuppModal(button) {
+        var id = button.getAttribute('data-id');
+        document.getElementById('deleteForm').action = '/delete_realisations/' + id;
+
+        var SuppModal = new bootstrap.Modal(document.getElementById('SuppModal'));
+        SuppModal.show();
+        }
+    </script>
+
   </body>
 </html>

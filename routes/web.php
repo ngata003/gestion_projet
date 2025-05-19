@@ -18,29 +18,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('users.inscription');
-});
-Route::get('/connexion', function () {
-    return view('users.connexion');
-});
-Route::get('/projet', function () {
-    return view('projet');
-});
-Route::get('/utilisateurs', [UserController::class,'view_gestionnaires']);
-Route::get('/ajouter_realisation', function(){
-    return view('realisations.realisation');
-});
-Route::post('/add_inscription', [UserController::class,'add_inscription']);
-Route::get('/mesTaches', [TachesController::class,'mesTaches']);
-Route::post('/add_projet',[ProjetController::class,'add_projet']);
-Route::get('/realisations',[TachesController::class,'view_realisations']);
-Route::post('/add_connexion',[UserController::class,'add_connexion']);
-Route::post('/add_gestionnaires',[UserController::class,'add_gestionnaires']);
-Route::delete('/delete_gestionnaires/{id}',[UserController::class,'delete_gestionnaires']);
-Route::put('/gestionnaires_edit/{id}',[UserController::class,'edit_gestionnaires']);
-Route::get('/taches',[TachesController::class,'AllTaches']);
-Route:: post('/add_taches',[TachesController::class,'taskAdded']);
-Route::delete('/delete_taches/{id}',[TachesController::class,'delete_taches']);
-Route::put('/edit_taches/{id}',[TachesController::class,'edit_taches']);
-Route::post('/add_realisations',[TachesController::class,'add_realisations']);
+Route::get('/', function () {return view('users.inscription');});
+Route::get('/connexion', function () {return view('users.connexion');});
+Route::get('/projet', function () {return view('projet');})->middleware('role:admin');
+Route::get('/utilisateurs', [UserController::class,'view_gestionnaires'])->middleware('role:admin');
+Route::get('/mesTaches', [TachesController::class,'mesTaches'])->middleware('role:developpeur,analyste');
+Route::get('/realisations',[TachesController::class,'view_realisations'])->middleware('role:admin');
+Route::get('/taches',[TachesController::class,'AllTaches'])->middleware('role:admin');
+Route::get('/view_details/{id}',[TachesController::class,'afficher_details'])->middleware('role:admin');
+Route::get('/profil',[UserController::class,'view_profil'])->middleware('role:admin,developpeur,analyste');
+Route::get('/view_profil/{id}',[ProjetController::class,'view_profil'])->middleware('role:admin,developpeur,analyste');
+
+Route::post('/add_inscription', [UserController::class,'add_inscription'])->middleware('role:admin');
+Route::post('/add_projet',[ProjetController::class,'add_projet'])->middleware('role:admin');
+Route::post('/add_connexion',[UserController::class,'add_connexion'])->middleware('role:admin,developpeur,analyste');
+Route::post('/add_gestionnaires',[UserController::class,'add_gestionnaires'])->middleware('role:admin');
+Route::delete('/delete_gestionnaires/{id}',[UserController::class,'delete_gestionnaires'])->middleware('role:admin');
+Route::put('/gestionnaires_edit/{id}',[UserController::class,'edit_gestionnaires'])->middleware('role:admin');
+Route::post('/add_taches',[TachesController::class,'taskAdded'])->middleware('role:admin');
+Route::delete('/delete_taches/{id}',[TachesController::class,'delete_taches'])->middleware('role:admin');
+Route::put('/edit_taches/{id}',[TachesController::class,'edit_taches'])->middleware('role:admin');
+Route::post('/add_realisations',[TachesController::class,'add_realisations'])->middleware('role:admin');
+Route::delete('/delete_realisations/{id}',[TachesController::class,'delete_realisations'])->middleware('role:admin');
+Route::put('/valider_taches/{id}',[TachesController::class,'valider_taches'])->middleware('role:developpeur,analyste');

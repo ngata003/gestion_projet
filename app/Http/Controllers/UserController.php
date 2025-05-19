@@ -101,7 +101,7 @@ class UserController extends Controller
         if ($request->hasFile('image_user')) {
             $imageFile = $request->file('image_user');
             $imageName = time().'.'. $imageFile->getClientOriginalExtension();
-            $imageFile->move(public_path('/assets/images'),$imageName);
+            $imageFile->move(public_path(path: '/assets/images'),$imageName);
         }
 
         $gestionnaire = new User();
@@ -117,8 +117,8 @@ class UserController extends Controller
         $gestionnaire->image_user = $imageName;
 
         $gestionnaire->save();
-        
-        Mail::to($gestionnaire->email)->send(new passwordGeneratedMail($gestionnaire, $password));
+
+        Mail::to($gestionnaire->email)->send(new passwordGeneratedMail($gestionnaire, $passwordFirst));
 
         return back()->with('ajout_gestionnaire', 'Gestionnaire ajouté avec succès.' );
     }
@@ -164,10 +164,11 @@ class UserController extends Controller
             }
 
             else if($utilisateur->type === 'gestionnaire') {
+
                 $projet = projet::where('nom_projet', $utilisateur->nom_projet)->first();
                 Session::put('projet_active',$projet);
 
-                return redirect('/myProfil');
+                return redirect('/mesTaches')->with('status_connexion', 'connexion effectuée avec succès');
             }
         }
 
@@ -213,4 +214,11 @@ class UserController extends Controller
 
         return back()->with('edit_gestionnaire', 'Gestionnaire modifié avec succès');
     }
+
+    public function view_profil(){
+        $user = Auth::user();
+        return view('users.profil',compact('user'));
+    }
+ 
+
 }

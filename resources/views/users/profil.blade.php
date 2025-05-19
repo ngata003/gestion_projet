@@ -61,7 +61,7 @@
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
           <ul class="nav">
             @if (Auth::user()->role == 'admin')
-             <li class="nav-item">
+            <li class="nav-item">
               <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
                 <i class="menu-icon mdi mdi-account-circle-outline"></i>
                 <span class="menu-title"> Utilisateurs </span>
@@ -115,32 +115,32 @@
             <div class="row">
               <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
-                    @if (session('taskAdded'))
+                    @if (session('ajout_gestionnaire'))
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('taskAdded') }}
+                                {{ session('ajout_gestionnaire') }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                     @endif
-                    @if (session('taskDeleted'))
+                    @if (session('delete_gestionnaire'))
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('taskDeleted') }}
+                                {{ session('delete_gestionnaire') }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                     @endif
-                     @if (session('taskEdited'))
+                     @if (session('edit_gestionnaire'))
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ session('taskEdited') }}
+                                {{ session('edit_gestionnaire') }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                     @endif
                   <div class="card-body">
                     <div class="d-sm-flex justify-content-between align-items-start">
                         <div>
-                          <h4 class="card-title card-title-dash"> Espace Taches </h4>
-                          <p class="card-subtitle card-subtitle-dash"> management des Taches </p>
+                          <h4 class="card-title card-title-dash"> Espace Gestionnaires </h4>
+                          <p class="card-subtitle card-subtitle-dash"> management des employes </p>
                         </div>
                         <div>
-                          <button class="btn btn-primary btn-lg text-white mb-0 me-0" data-bs-toggle="modal" data-bs-target="#importModal" type="button" ><i class="mdi mdi-account-plus"></i>Ajouter une nouvelle tache  </button>
+                          <button class="btn btn-primary btn-lg text-white mb-0 me-0" data-bs-toggle="modal" data-bs-target="#importModal" type="button" ><i class="mdi mdi-account-plus"></i>Ajouter un nouvel employé  </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -148,26 +148,26 @@
                         <thead>
                           <tr>
                             <th> nom </th>
-                            <th> status </th>
+                            <th> email </th>
+                            <th> contact </th>
+                            <th>  image Utilisateur  </th>
                             <th> actions </th>
                           </tr>
                         </thead>
                         <tbody>
-                            @foreach ($taches as $tsk )
-                            <tr>
-                                <td > {{$tsk->nom_tache}} </td>
-                                @if ($tsk->status == 1)
-                                    <td> <span class="badge badge-success"> pris </span> </td>
-                                @else
-                                    <td> <span class="badge badge-danger"> non pris </span> </td>
-
-                                @endif
-                                <td>
-                                    <button class="btn btn-secondary text-white" data-id="{{$tsk->id}}" data-nom="{{$tsk->nom_tache}}" onclick="openEditModal(this)"> <i class="fas fa-edit"></i> </button>
-                                    <button class="btn btn-danger text-white" data-id="{{$tsk->id}}" onclick="openDeleteModal(this)" > <i class="fas fa-trash"></i> </button>
-                                </td>
-                            </tr>
-                            @endforeach
+                        @foreach ($profil as $gestion )
+                        <tr>
+                            <td > {{$gestion->name}} </td>
+                            <td>  {{$gestion->email}} </td>
+                            <td>  {{$gestion->contact}}</td>
+                            <td>  {{$gestion->role}} </td>
+                            <td><img src="" alt=""></td>
+                            <td>
+                                <button class="btn btn-secondary text-white" data-id="{{$gestion->id}}" data-nom="{{$gestion->name}}" data-email="{{$gestion->email}}"  data-contact="{{$gestion->contact}}"  data-role="{{$gestion->role}}" onclick="openEditModal(this)"> <i class="fas fa-edit"></i> </button>
+                                <button class="btn btn-danger text-white" data-id="{{$gestion->id}}" onclick="openDeleteModal(this)" > <i class="fas fa-trash"></i> </button>
+                            </td>
+                          </tr>
+                        @endforeach
                         </tbody>
                       </table>
                     </div>
@@ -184,24 +184,40 @@
         </div>
       </div>
     </div>
-
     <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel"> Ajouter une tache   </h5>
+                    <h5 class="modal-title" id="exampleModalLabel"> Ajouter un employé   </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="/add_taches" id="formulaire" >
+                    <form method="POST" action="/add_gestionnaires" id="formulaire" enctype="multipart/form-data">
                         @csrf
+                    <div class="mb-3">
+                            <label for="centreName" class="form-label">Nom </label>
+                            <input type="text" name="name" class="form-control" id="" placeholder="entrer un nom valide ">
+                        </div>
                         <div class="mb-3">
-                                <label for="centreName" class="form-label">Nom Tache </label>
-                                <input type="text" name="nom_tache" class="form-control" id="" placeholder="entrer un nom valide ">
-                            </div>
-                            <div class="button-container">
+                            <label for="centreName" class="form-label"> Email </label>
+                            <input type="email" name="email" class="form-control" id="centreName" placeholder="entrer un email valide ">
+                        </div>
+                        <div class="mb-3">
+                            <label for="centreName" class="form-label"> Contact </label>
+                            <input type="tel" name="contact" class="form-control" id="" placeholder="entrer un contact valide">
+                        </div>
+                        <input type="hidden" name="type" value="gestionnaire" class="form-control" id="" placeholder="entrer un type">
+                        <div class="mb-3">
+                            <label for="centreName" class="form-label"> role du gestionnaire </label>
+                            <select name="role" class="form-control" id="">
+                                <option> selectionnez un role </option>
+                                <option value="analyste"> analyste </option>
+                                <option value="developpeur"> developpeur </option>
+                            </select>
+                        </div>
+                        <div class="button-container">
                             <button type="submit" id="bouton" class="button btn btn-success" > enregistrer </button>
-                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" >Fermer</button>
                         </div>
                     </form>
                 </div>
@@ -222,36 +238,30 @@
                         @method('PUT')
 
                         <div class="mb-3">
-                                <label for="centreName" class="form-label">Nom Tache </label>
-                                <input type="text" name="nom_tache" class="form-control" id="nom_tache" placeholder="entrer un nom valide ">
-                            </div>
-                            <div class="button-container">
-                            <button type="submit" id="bouton" class="button btn btn-success" > Modifier </button>
-                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"> Fermer </button>
+                            <label for="centreName" class="form-label">Nom </label>
+                            <input type="text" name="name" class="form-control" id="name" placeholder="entrer un nom valide ">
+                        </div>
+                        <div class="mb-3">
+                            <label for="centreName" class="form-label"> Email </label>
+                            <input type="email" name="email" class="form-control" id="email" placeholder="entrer un email valide ">
+                        </div>
+                        <div class="mb-3">
+                            <label for="centreName" class="form-label"> Contact </label>
+                            <input type="tel" name="contact" class="form-control" id="contact" placeholder="entrer un contact valide">
+                        </div>
+                        <div class="mb-3">
+                            <label for="centreName" class="form-label"> role du gestionnaire </label>
+                            <select name="role" class="form-control" id="role">
+                                <option> selectionnez un role </option>
+                                <option value="developpeur"> developpeur </option>
+                                <option value="analyste"> analyste </option>
+                            </select>
+                        </div>
+                        <div class="button-container">
+                          <input type="submit" class="button btn btn-success" name="save" value="Enregistrer">
+                          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Supprimer la tache </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                Êtes-vous sûr de vouloir supprimer cette tache  ?
-                </div>
-                <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Non</button>
-                <form method="POST" id="deleteForm">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-success">Oui</button>
-                </form>
                 </div>
             </div>
         </div>
@@ -271,10 +281,16 @@
         function openEditModal(button) {
             var id = button.getAttribute('data-id');
             var nom = button.getAttribute('data-nom');
+            var contact = button.getAttribute('data-contact');
+            var email = button.getAttribute('data-email');
+            var image = button.getAttribute('data-image');
 
-            document.getElementById('editModalLabel').textContent = 'Editer une tache ';
-            document.getElementById('editForm').action = '/edit_taches/' + id;
-            document.getElementById('nom_tache').value = nom;
+            document.getElementById('editModalLabel').textContent = 'Editer une agence ';
+            document.getElementById('editForm').action = '/profil_edit/' + id;
+            document.getElementById('name').value = nom;
+            document.getElementById('email').value = email;
+            document.getElementById('role').value = role;
+            document.getElementById('contact').value = contact;
 
             var editModal = new bootstrap.Modal(document.getElementById('editModal'));
             editModal.show();
@@ -282,13 +298,11 @@
     </script>
 
     <script>
-        function openDeleteModal(button) {
-        var id = button.getAttribute('data-id');
-        document.getElementById('deleteForm').action = '/delete_taches/' + id;
-
-        var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        deleteModal.show();
-        }
+        $(document).ready(function () {
+            @if ($errors->any())
+                $("#errorModal").modal("show");
+            @endif
+        });
     </script>
   </body>
 </html>

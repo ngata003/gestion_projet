@@ -60,13 +60,8 @@
       <div class="container-fluid page-body-wrapper">
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
           <ul class="nav">
-            <li class="nav-item">
-              <a class="nav-link" href="mesTaches">
-                <i class="menu-icon mdi mdi-clipboard-text-outline"></i>
-                <span class="menu-title"> Mes Taches </span>
-              </a>
-            </li>
-            <li class="nav-item">
+            @if (Auth::user()->role == 'admin')
+             <li class="nav-item">
               <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
                 <i class="menu-icon mdi mdi-account-circle-outline"></i>
                 <span class="menu-title"> Utilisateurs </span>
@@ -74,7 +69,7 @@
               </a>
               <div class="collapse" id="form-elements">
                 <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"><a class="nav-link" href="profil"> Mon profil </a></li>
+                  <li class="nav-item"><a class="nav-link" href="myProfil"> Mon profil </a></li>
                   <li class="nav-item"><a class="nav-link" href="utilisateurs"> Employes </a></li>
                 </ul>
               </div>
@@ -92,6 +87,27 @@
                 </ul>
               </div>
             </li>
+            @endif
+            @if (Auth::user()->role == 'developpeur' || Auth::user()->role == 'analyste')
+            <li class="nav-item">
+              <a class="nav-link" href="mesTaches">
+                <i class="menu-icon mdi mdi-clipboard-text-outline"></i>
+                <span class="menu-title"> Mes Taches </span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
+                <i class="menu-icon mdi mdi-account-circle-outline"></i>
+                <span class="menu-title"> Utilisateurs </span>
+                <i class="menu-arrow"></i>
+              </a>
+              <div class="collapse" id="form-elements">
+                <ul class="nav flex-column sub-menu">
+                  <li class="nav-item"><a class="nav-link" href="myProfil"> Mon profil </a></li>
+                </ul>
+              </div>
+            </li>
+            @endif
           </ul>
         </nav>
         <div class="main-panel">
@@ -100,13 +116,16 @@
               <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body">
+                    @if (session('taskValidated'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('taskValidated') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                    @endif
                     <div class="d-sm-flex justify-content-between align-items-start">
                         <div>
                           <h4 class="card-title card-title-dash"> Espace Taches </h4>
                           <p class="card-subtitle card-subtitle-dash"> management des Taches </p>
-                        </div>
-                        <div>
-                          <button class="btn btn-primary btn-lg text-white mb-0 me-0" data-bs-toggle="modal" data-bs-target="#importModal" type="button" ><i class="mdi mdi-account-plus"></i>Ajouter une nouvelle tache  </button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -114,6 +133,7 @@
                         <thead>
                           <tr>
                             <th> tache </th>
+                            <th> description </th>
                             <th> date debut </th>
                             <th> date fin </th>
                             <th> status </th>
@@ -121,16 +141,19 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td > Herman Beck </td>
-                            <td> 11-02-2004  </td>
-                            <td> 12-06-2005 </td>
-                            <td> fini </td>
-                            <td>
-                                <button class="btn btn-secondary text-white" data-id="" data-nom="" data-email=""  data-contact="" data-residence="" data-image="" data-role="" onclick="openEditModal(this)"   > <i class="fas fa-edit"></i> </button>
-                                <button class="btn btn-danger text-white" data-id="" onclick="openDeleteModal(this)" > <i class="fas fa-check"></i> </button>
-                            </td>
-                          </tr>
+                        @foreach ($taches as $tach )
+                            <tr>
+                                <td > {{$tach->nom_tache}} </td>
+                                <td> {{$tach->description}}  </td>
+                                <td> {{$tach->date_debut}} </td>
+                                <td> {{$tach->date_fin}}</td>
+                                <td> {{$tach->status}} </td>
+                                <td>
+                                    <button class="btn btn-primary text-white" data-description="{{$tach->description}}" onclick="openVisibleModal(this)"> <i class="fas fa-eye"></i> </button>
+                                    <button class="btn btn-success text-white" data-id="{{$tach->id}}" onclick="openValidModal(this)" ><i class="fas fa-check"></i></button>
+                                </td>
+                            </tr>
+                        @endforeach
                         </tbody>
                       </table>
                     </div>
@@ -147,6 +170,46 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="VisibleModal" tabindex="-1" aria-labelledby="VisibleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="VisibleModalLabel">Voir la description de la tâche</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="descriptionContent">Chargement...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="validModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel"> Marquer la tache comme faite </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                Êtes-vous sûr d'avoir fini cette tache?
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Non</button>
+                <form method="POST" id="deleteForm">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" class="btn btn-success">Oui</button>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
     <script src="../../assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
     <script src="../../assets/js/off-canvas.js"></script>
@@ -155,6 +218,35 @@
     <script src="../../assets/js/hoverable-collapse.js"></script>
     <script src="../../assets/js/todolist.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function ValidModal(button) {
+        var id = button.getAttribute('data-id');
+        document.getElementById('deleteForm').action = '/valider_taches/' + id;
+
+        var ValidModal = new bootstrap.Modal(document.getElementById('ValidModal'));
+        ValidModal.show();
+        }
+    </script>
+
+    <script>
+        function openValidModal(button) {
+        var id = button.getAttribute('data-id');
+        document.getElementById('deleteForm').action = '/valider_taches/' + id;
+
+        var validModal = new bootstrap.Modal(document.getElementById('validModal'));
+        validModal.show();
+        }
+    </script>
+
+    <script>
+        function openVisibleModal(button) {
+            var description = button.getAttribute('data-description');
+            document.getElementById('descriptionContent').textContent = description;
+            var modal = new bootstrap.Modal(document.getElementById('VisibleModal'));
+            modal.show();
+        }
+    </script>
+
   </body>
 </html>
